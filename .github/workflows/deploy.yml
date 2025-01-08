@@ -47,6 +47,6 @@ jobs:
       # 8. 컨테이너 실행
       - name: Deploy Docker container
         run: |
-          docker stop spring-app || true
-          docker rm spring-app || true
-          docker run -d -p 8080:8080 --name spring-app ${{ secrets.DOCKER_USERNAME }}/multi-module-test:latest
+          sudo docker stop spring-app || true
+          sudo docker rm spring-app || true
+          sudo docker run -d -p 8080:8080 --name spring-app ${{ secrets.DOCKER_USERNAME }}/multi-module-test:latest
