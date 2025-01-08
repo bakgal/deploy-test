@@ -31,7 +31,7 @@ jobs:
 
       # 5. Docker 이미지 업로드
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/multi-module-test:latest .
+        run: sudo docker build -t ${{ secrets.DOCKER_USERNAME }}/multi-module-test:latest .
 
       # 6. 도커 허브 로그인
       - name: Login to Docker hub
@@ -42,7 +42,7 @@ jobs:
 
       # 7. 도커 허브 푸시
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/multi-module-test:latest
+        run: sudo docker push ${{ secrets.DOCKER_USERNAME }}/multi-module-test:latest
 
       # 8. 컨테이너 실행
       - name: Deploy Docker container
