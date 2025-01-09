@@ -66,4 +66,4 @@ jobs:
 
       # 11. 도커 이미지 정리
       - name: Cleanup unused Docker images
-        run: sudo docker image prune --all --force
+        run: sudo docker image prune --force --filter "until=24h"
