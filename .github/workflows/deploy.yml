@@ -51,7 +51,7 @@ jobs:
       - name: Push Docker image
         run: sudo docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ secrets.IMAGE_TAG }}
 
-      # 9. EC2에서 Blue-Green 배포 스크립트 실행
+      # 9. 도커 최신 이미지 풀
       - name: Pull latest Docker image from Docker Hub
         run: sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }} 
           | sudo docker pull ${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ secrets.IMAGE_TAG }}
