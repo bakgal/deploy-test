@@ -41,9 +41,19 @@ jobs:
       - name: Push Docker image
         run: sudo docker push ${{ secrets.DOCKER_USERNAME }}/multi-module-test:latest
 
-      # 8. 컨테이너 실행
-      - name: Deploy Docker container
+      # 8. EC2에서 Blue-Green 배포 스크립트 실행
+      - name: Pull latest Docker image from Docker Hub
         run: |
-          sudo docker stop spring-app || true
-          sudo docker rm spring-app || true
-          sudo docker run -d -p 8080:8080 --name spring-app ${{ secrets.DOCKER_USERNAME }}/multi-module-test:latest
+          sudo docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password ${{ secrets.DOCKER_HUB_PASSWORD }}
+          sudo docker pull ${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ secrets.IMAGE_TAG }}
+
+      # 9. Blue-Green 배포 스크립트 실행
+      - name: Execute deploy.sh
+        run: |
+          cd /home/ubuntu/deploy
+          sudo chmod +x deploy.sh
+          sudo ./deploy.sh
+
+      # 10. 도커 이미지 정리
+      - name: Cleanup unused Docker images
+        run: sudo docker image prune --all --force
