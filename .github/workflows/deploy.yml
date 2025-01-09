@@ -61,9 +61,8 @@ jobs:
       - name: Execute deploy.sh
         run: |
           cd /home/ubuntu/deploy
-          sudo chmod +x deploy.sh
           sudo ./deploy.sh
 
-      # 11. 도커 이미지 정리
-      - name: Cleanup unused Docker images
-        run: sudo docker image prune --force --filter "until=24h"
+#      # 11. 도커 이미지 정리
+#      - name: Cleanup unused Docker images
+#        run: sudo docker image prune --force --filter "until=24h"
