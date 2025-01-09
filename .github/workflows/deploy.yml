@@ -14,46 +14,56 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. JDK 설치
+      # 2. Gradle 캐싱
+      - name: Gradle Caching
+        uses: actions/cache@v4
+        id: cache-gradle
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # 3. JDK 설치
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 3. Gradle Wrapper 실행 권한 부여
+      # 4. Gradle Wrapper 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 4. 프로젝트 빌드
+      # 5. 프로젝트 빌드
       - name: Build project
         run: ./gradlew clean build
 
-      # 5. Docker 이미지 업로드
+      # 6. Docker 이미지 업로드
       - name: Build Docker image
         run: sudo docker build -t ${{ secrets.DOCKER_USERNAME }}/multi-module-test:latest .
 
-      # 6. 도커 허브 로그인
+      # 7. 도커 허브 로그인
       - name: Login to Docker Hub
         run: sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
 
-      # 7. 도커 허브 푸시
+      # 8. 도커 허브 푸시
       - name: Push Docker image
-        run: sudo docker push ${{ secrets.DOCKER_USERNAME }}/multi-module-test:latest
+        run: sudo docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ secrets.IMAGE_TAG }}
 
-      # 8. EC2에서 Blue-Green 배포 스크립트 실행
+      # 9. EC2에서 Blue-Green 배포 스크립트 실행
       - name: Pull latest Docker image from Docker Hub
         run: |
-          sudo docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password ${{ secrets.DOCKER_HUB_PASSWORD }}
+          sudo docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
           sudo docker pull ${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ secrets.IMAGE_TAG }}
 
-      # 9. Blue-Green 배포 스크립트 실행
+      # 10. Blue-Green 배포 스크립트 실행
       - name: Execute deploy.sh
         run: |
           cd /home/ubuntu/deploy
           sudo chmod +x deploy.sh
           sudo ./deploy.sh
 
-      # 10. 도커 이미지 정리
+      # 11. 도커 이미지 정리
       - name: Cleanup unused Docker images
         run: sudo docker image prune --all --force
